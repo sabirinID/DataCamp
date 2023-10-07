@@ -2,9 +2,7 @@
 
 # Data Scientist Professional with Python
 
-
-### Completion Date :
-- 
+[Click to view website →](https://app.datacamp.com/learn/career-tracks/data-scientist-professional-with-python)
 
 ---
 
@@ -56,5 +54,3 @@ Complete this track to gain the knowledge and experience necessary to confidentl
 29. Intermediate SQL
 30. Joining Data in SQL
 31. Introduction to Git
-
-Link: https://app.datacamp.com/learn/career-tracks/data-scientist-professional-with-python
