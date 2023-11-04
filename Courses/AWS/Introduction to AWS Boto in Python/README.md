@@ -5,7 +5,7 @@
 Link: https://app.datacamp.com/learn/courses/introduction-to-aws-boto-in-python
 
 ## Course Description
-What if you were no longer constrained by the capabilities of your laptop? What if you could get an SMS when a city garbage truck camera spots a missing a cat? This is all possible with cloud technology. This course will teach you how to integrate Amazon Web Services (AWS) into your data workflow. You’ll learn how to upload data to S3, AWS cloud storage. You’ll use triggers from your analysis to send text messages with AWS SNS. You will use Rekognition to detect objects in an image. And you will use Comprehend to decide if a piece of feedback is negative. By the time you’re done, you will learn how to build a pipeline, subscribe people to it, and send them text messages when an image contains a cat!
+What if you were no longer constrained by the capabilities of your laptop? What if you could get an SMS when a city garbage truck camera spots a missing a cat? This is all possible with cloud technology. This course will teach you how to integrate Amazon Web Services (AWS) into your data workflow. You'll learn how to upload data to S3, AWS cloud storage. You'll use triggers from your analysis to send text messages with AWS SNS. You will use Rekognition to detect objects in an image. And you will use Comprehend to decide if a piece of feedback is negative. By the time you're done, you will learn how to build a pipeline, subscribe people to it, and send them text messages when an image contains a cat!
 
 1. Putting Files in the Cloud!
 
