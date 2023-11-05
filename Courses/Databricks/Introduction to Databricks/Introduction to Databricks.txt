@@ -1,0 +1,303 @@
+## Why pick a Lakehouse?
+
+You are a cloud data architect working for Sierra Publishing, a global book publishing company. You have been presenting your ideas to your leadership team, namely the Chief Information Officer, that your company should start to use the Databricks Lakehouse Platform. You have presented a summarized list of benefits of switching to a lakehouse architecture.
+
+Which of the following is not a reason to implement a lakehouse architecture?
+
+# You want to store all of your data in a proprietary data format.
+
+## Benefits of the Databricks Lakehouse
+As part of your presentation to the CIO, you would like to list why you should want to switch to the lakehouse architecture.
+
+Which of the following are key benefits of the Databricks platform? Select all that apply.
+
+# Built on open-source technologies
+# Databricks can run on any major cloud provider.
+# Databricks enables data teams to be more collaborative.
+
+## Architectural Decisions
+You are finalizing your presentation to your executive leadership team about which architecture is best for your organization. Across the company, you have teams that need access to data for reports and dashboards and for developing machine learning models. You have concluded that the Databricks Lakehouse architecture will benefit your data ecosystem and need to summarize the benefits of this design over traditional methods (data warehousing or data lake).
+
+## Why Delta?
+As you develop your future-state architecture, you have started to think about how to store your organization's data. You know you want to store data in a data lake and have heard a lot about the Delta Lake table format.
+
+Which of the following are the benefits of storing data in the Delta table format? Select all that apply.
+
+# Fully ACID-compliant transactions
+# Unified batch and streaming data sources
+# Time travel and table history
+
+## Databricks for different personas
+One of the concerns of your CIO is that your future data architecture must satisfy all the different teams who work with your company's data. While you feel confident that Databricks can, you want to provide a list that clearly outlines supported personas.
+
+Which of the following is not a dedicated persona in the Databricks Lakehouse platform?
+
+# Software developer
+
+## Capabilities for each data persona
+As you go deeper in your architectural design, you have decided to enable your end users on the different capabilities they will have at their disposal. You have separated your downstream data teams into their different functions (data analysts, data engineers, and data scientists) and want to send them specific materials about the relevant capabilities in Databricks for them.
+
+## Managing and adding users
+As your organization starts to adopt Databricks more, you have deployed multiple different workspaces for your lines of business. Each workspace is designed for a particular team and should only have access to their respective datasets. Your CIO has expressed concerns about how you can control access to the underlying datasets and the workspaces themselves as adoptions grow. They have asked you how Databricks and your architecture address this concern.
+
+Which of the following statements is true with regard to user access within a Databricks account?
+
+# You can automatically sync users from your IdP to your Databricks account and then assign them to the correct workspaces based on their line of business.
+
+## Control Plane vs. Data Plane
+As you deploy your Databricks workspaces, you ensure your security team has approved the platform. In particular, the security team is curious about what information Databricks has access to and what you control.
+
+Which of the following is true regarding the relationship between the Databricks Control Plane and the customer Data Plane?
+
+# User interactions with the Databricks platform exist within the Control Plane, and is responsible for tasks such as launching clusters and initiating jobs.
+# The Data Plane is where customers store their data in the data lake, ensuring better data security.
+
+## Configure your Databricks workspace
+The Chief Information Officer has recently decided to incorporate Databricks into your data architecture. You are tasked with setting up the environment so your downstream data consumers (data scientists, data engineers, data analysts) can use the environment safely and securely.
+
+## Data Explorer capabilities
+You are a data engineer working for the centralized IT department at Sierra Publishing. On a day-to-day basis, you will get a variety of requests from different parts of your organization regarding different datasets. Historically, you have explored data programmatically by reading in different datasets one at a time.
+
+# Ability to see sample data for a particular table.
+# See the lineage for your data assets.
+# Ability to share data with other users.
+
+## Setting up a notebook
+As a data engineer for Sierra Publishing, you often have to work with various data analysts to create their reporting tables. In the past, your processes have been completely separated, often leading to slow or mismatched development needs. You would like to create a notebook that leverages Databricks collaboration and multi-language capabilities so you can work side by side in the same data asset.
+
+# Create a Python notebook for your data engineering pipelines, and use %sql in the cells for your data analysts.
+
+## Cluster configurations
+You have received various requests from your central IT group to reign in the kinds of clusters that can be created in Databricks. The IT team will start implementing different cluster policies for the different groups using the Databricks platform. Since you lead your data engineering team, the IT team would like you to provide a list of configurations you need to complete your work.
+
+# Incorrect
+# While we can configure options such as Photon, we cannot directly control how fast workloads can run, as it will depend on each particular workload.
+# While you can use Databricks to track your costs spent on a particular cluster, you cannot specify a budget for how much the cluster will cost each month directly.
+
+## DataFrames
+As the lead data engineer at Sierra Publishing, you are leading your team in migrating into Databricks for their data pipelines. Some of your newer data engineers are concerned that they won't be able to work with Databricks since they are unfamiliar with DataFrames. They currently work in Python and SQL and will learn Spark as they continue using Databricks.
+
+Which of the following points should you tell your team so they feel comfortable about the transition?
+
+# DataFrames already exist in both pandas and SQL.
+# Databricks will create the DataFrame, regardless of the language you use in your programming.
+
+## Reading from a database
+As a data engineer for Sierra Publishing, you often need to reference datasets from other groups within your organization. In this case, you need to read data relating to recent marketing campaigns, which is stored on a Postgres database in the cloud. Historically you have logged into the database and manually run the queries, but you would like to pull that data into a Databricks notebook and process the data with a Spark DataFrame.
+
+What is your best approach if you only want to read the data directly from the database?
+
+# Use `spark.read()` to use a JDBC connection and read data from the database.
+
+## Write an external table
+As you continue to work with the marketing campaign dataset, you realize that you have been using the dataset more frequently than you thought. Since you continue to query the database, you decide to write it to a Delta table in the lakehouse. This will speed up your future query times and make your processing much faster.
+
+You want to write this table into an external table on your data lake so other tools can access it more directly.
+
+# CREATE TABLE, USING, OPTIONS, LOCATION
+
+## Loading in hosted files
+Your data engineering team at Sierra Publishing has been looking into different features of Databricks for their data engineering pipelines. One of your data engineers has posed a problem to you:
+
+Right now, I am reading in several CSV files from an external data lake location. It has been really hard to keep my tables accurate because I never know when the new data files come in, and I cannot easily remember which files I have already loaded into my tables.
+
+You want to use built-in Databricks functionality to solve this problem. Which of the following options would help solve the problem?
+
+# Use Auto Loader to automatically ingest new data files as they come in.
+
+## Selecting the right language
+As you migrate your existing data pipelines into Databricks, your data engineering team wonders if they are selecting the correct language for development. While you don't want to refactor everything, you want to ensure the selected language is the best long-term selection for your problem, and that Databricks can support the required langauge.
+
+# Incorrect
+# Databricks doesn't support Ruby, Rust, and C#.
+
+## Data pipeline steps
+One of your more business-critical data pipelines at Sierra Publishing relies on a high-velocity data stream, which comes from a Kafka data stream. We need to read in the data and join it with a few other datasets.
+
+Data Streaming Pipeline
+
+Your data engineering team would like to use Databricks to make this data pipeline more efficient and allow the downstream consumers to read this data in real time for their analytics.
+
+# Gather, Read, Clean, Join, Write
+
+## Possible automations in Databricks
+As a Data Engineer, you have many different tasks as part of your data pipelines. You seek ways to automate those activities to free up time and minimize errors.
+
+Your organization has various tools and processes on your old technology systems. While some of your tasks could run in Databricks, you realize that only some things can work directly.
+
+# Incorrect
+# Databricks cannot control other cloud applications directly.
+# Databricks can run standard Python scripts and can automate them.
+# We cannot run Excel on top of Databricks.
+
+## Benefits of Delta Live Tables
+Which of the following are benefits of developing data pipelines with Delta Live Tables? Select all that apply.
+
+# Hint
+Delta Live Tables aim to simplify the development of new data pipelines by automating and combining different aspects of data engineering. Think about the tasks that go into a quality data pipeline such as:
+speed
+quality
+reliability
+flexibility
+
+# Combined process for batch and streaming datasets
+# Maintain better data quality with set expectations
+
+## Data pipeline steps
+As the lead Data Engineer at Sierra Publishing, you and your team of Data Engineers have been asked to clean book review data into an analytic-ready dataset for your analysts and data scientists.
+
+Since you get data daily from your various publishing partners, you must create an automated and reliable data pipeline for your downstream data consumers.
+
+# Ingest, Create ... clean and join, Create ... aggregate, Orchestrate, Monitor
+
+## Benefits of Databricks SQL
+As a senior analyst for Sierra publishing, you want to overhaul your organization's current data warehousing solution. You have heard your data engineers talk about Databricks before and learned that the platform also has SQL capabilities. As you dive into some of the specific features, you have decided to try out Databricks SQL as part of your analytics workflow. First, you must make a case for your leadership to try out the platform.
+
+Which of the following are benefits you will experience by moving your workloads to Databricks SQL?
+
+# Access to more advanced capabilities as part of a broader platform
+# Flexibile, open access to data and the SQL language
+# Use of a scalable, optimized compute engine for SQL workloads
+
+## Databricks SQL in the data workflow
+You have spoken to the leadership team about using Databricks SQL, and they seem interested in using it for your analytical processes! Your leaders are new to Databricks and are confused about how the Databricks SQL component fits into the overall data process.
+
+# Ingest, Clean, Aggregate, Query, Visualize
+
+## Databricks SQL vs. other databases
+A couple of analysts on your team have concerns about using Databricks SQL for their analytics. While they understand that Databricks can support their workloads, they haven't fully bought into changing their processes yet. They have historically used other data warehousing tools and don't understand what makes Databricks SQL different.
+
+# Databricks SQL
+# Leverage ML models
+# Operates on open data formats
+# Built on ANSI SQL and Spark
+
+## Choosing your SQL warehouse
+You are starting to query some of Sierra Publishing's book sale data and want to ensure you have the right kind of SQL warehouse for what you need. You want to make sure you have the latest features that Databricks has put out there. Your users are also used to quickly accessing the data behind their reports and don't want to wait for the warehouse to spin up too long.
+
+What kind of SQL warehouse should you create?
+
+# Serverless
+
+## SQL Editor vs. notebooks
+One of the analysts on your team has been writing their SQL queries in a Databricks Notebook, as they were unaware of the SQL Editor. While their current workflow is not wrong, you wanted to show them the benefits of the SQL Editor over notebook.
+
+Select all of the statements that are benefits of the SQL Editor over Databricks Notebooks for SQL workloads.
+
+# A dedicated data explorer pane to see catalogs, schema, and tables.
+# Dedicated area for writing SQL queries
+
+## Creating the usSales table
+Some of the newer analysts at Sierra Publishing want an example of creating a table in Databricks SQL. You are already working on creating a new table (usSales) that focuses on book sales in the United States, and you figure this could be a good example of how to write such a query.
+
+# CREATE TABLE, USING, AS, ()
+
+## Understanding Databricks SQL assets
+You and your team of analysts at Sierra Publishing have written several different queries to analyze sales data. At this point, you want to go beyond just looking at the tabular results of a query and want to understand what other options you have within the Databricks SQL environment.
+
+Which of the following best describes the relationship between different assets in Databricks SQL?
+
+# Queries can have multiple visualizations attached to them, and dashboards can show results from multiple queries or visualizations.
+
+## Using parameters in queries
+One of the queries you have created analyzes your sales from various book distributors. You have created a variety of visualizations from this query and are looking to share the results of this query in an interactive dashboard. Certain individuals will want to change the criteria for which distributors the query looks at. Thus, you decide to create two parameters and put them in your query:
+
+companyName : a drop-down selector that allows the user to select a single distributor to analyze
+transactionCount : a numerical value that denotes the number of books sold in each individual transaction
+
+Which of the below queries will give us the result that we want while also creating the parameter widgets in our dashboard?
+
+# SELECT * FROM sales_distribution WHERE distributor = {{companyName}} AND num_transactions >= {{transactionCount}}
+
+## Create a user review query
+As a senior data analyst at Sierra Publishing, you often need to provide visualizations and reports for different groups in the company. The sales and marketing teams are responsible for planning the next wave of books to generate and publish in different regions and would like a dashboard that can show which demographics you have already served for your next planning cycle.
+
+# USE, CREATE VIEW, SELECT, FROM, WHERE, GROUP BY
+
+## Lakehouse benefits to ML
+Your boss, the chief data scientist at Sierra Publishing, is not sure that Databricks is the right platform for your team, which has primarily done machine learning development locally on your own laptops. You want to show your boss that Databricks and the lakehouse architecture benefit your team and the broader organization.
+
+Which of the following are the benefits of running machine learning workloads in the Databricks Lakehouse platform?
+
+# Access to a scalable and performant compute engine.
+# Support for all the open source libraries and frameworks your team needs.
+# Allow your team to collaborate with data engineers and data analysts.
+
+## MLOps tasks in Databricks
+As a lead data scientist for Sierra Publishing, you have been asked to speak with the broader data community in your organization about some new machine learning initiatives. You have presented the general MLOps flow, but your data teams are still confused about where they might fall into the life cycle.
+
+You have decided that giving examples of tasks and identifying where they fall in the MLOps flow will be helpful.
+
+# DataOps: Adding, Ingesting, Removing
+# ModelOps: Training, Generating
+# DevOps: Deploying, Governing
+
+## EDA in Databricks
+A junior data analyst joined your team at Sierra Publishing recently and is not very comfortable using pandas for exploratory data analysis yet. Is there a way that they can contribute to your machine learning workloads?
+
+# Yes, they can use the built-in visualization tools in Databricks Notebooks for EDA.
+# Perfect! Databricks Notebooks have several built-in visualization options and would allow your new teammate to be a contributing team member for the EDA processes.
+
+## Why the ML Runtime?
+Your data science team at Sierra Publishing has historically run their machine learning applications on their local laptops. They use different tools to manually manage their libraries and packages but want to start working in the Databricks platform for machine learning workloads. Instead of replicating the processes they have for library management, you want the team to use built-in Databricks functionality.
+
+Which of the following are good reasons to use the Databricks ML Runtime instead of manual library management?
+
+# ML Runtime comes with the leading libraries pre-installed
+# ML Runtime is optimized for machine learning workloads
+
+## Exploring data in a notebook
+As a data scientist at Sierra Publishing, you have been tasked with preparing the team for a new machine learning use case. This new use case will look at the review data for all of your company's published books. You need to explore, understand, and featurize the data so that the machine learning team can start to develop their models.
+
+# df, dbutils, feature_df, from, fs
+
+## Single node vs. multi node ML
+Historically, the data scientists at Sierra Publishing have only trained their machine-learning models on their corporate laptops. As such, they have developed familiarity and processes with the single node machine learning frameworks but have needed help to get their models into production. They need help understanding the differences between single and multi node machine learning processes.
+
+As the lead data scientist, you have done considerable research into Databricks and feel you understand the differences in these approaches.
+
+# Multi node
+# Spark ML
+# Highly scalable
+# Great for production
+
+## Databricks for citizen data scientists
+You have several junior data scientists on your team at Sierra Publishing, and you want them to understand better how you like to create your production models. These junior data scientists aren't very comfortable creating their own machine-learning pipelines and would probably classify themselves as citizen data scientists. You want them to contribute how they can, but you also want to make sure you can understand and improve what they help to get started.
+
+What would be the best solution for your team to implement in Databricks?
+
+# The junior data scientists can create models with AutoML, and you can review or tune the code from the generated notebooks.
+# Exactly! Your junior data scientists can leverage AutoML to create a foundational model and use that to learn from. Then, you can further optimize the model based on your experience and knowledge.
+
+## Using MLFlow for Tracking
+Now that you and your team have ported your previous machine-learning processes into the Databricks environment, you are about to start a new machine-learning project.
+
+You are tasked with developing a new recommendation engine that takes in context from previous book reviews. Since you are developing a new model, you are still determining exactly what framework or parameters will result in the best model. This would be a great opportunity to use MLFlow to track all of your model runs, and then you can pick the best model from there.
+
+# Define, Start, Train, Compare, Select
+
+## Models and the Model Registry
+While you were working on other models, one of your data science teammates at Sierra Publishing was working on a newer version of your book recommendation model that you developed. This teammate did not register the model into the Model Registry and instead kept the model in a separate notebook. They are confident that the model is an improvement but do not understand why they should register it in the Registry.
+
+Which of the following are the benefits of using the Model Registry? Select all that apply.
+
+# Hint
+Think of the Model Registry as a UI to see all the different models and their pipelines, allowing you to refine where each model version goes.
+
+# Easily see current and past versions of the same model.
+# Ability to push a model into either Staging or Production.
+# Ability for others to discover their version of the model.
+
+## Why Databricks for model deployment?
+While speaking with your DevOps team about deploying your book recommendation model, they have been pushing back on using Databricks to deploy the model. Historically, they are very familiar with traditional deployment methods with on-prem compute resources. They are not, however, very well versed in how to do a similar process in the cloud.
+
+Which of the following best summarizes why they should consider using Databricks Model Serving Endpoints to host a machine learning model?
+
+# Model Serving Endpoints simplify the overhead of managing compute resources and provide built-in capabilities for model monitoring.
+
+## End-to-end ML pipeline
+As the senior data scientist as Sierra Publishing, you have now trained and deployed several machine learning models into production. Knowing this, you are being asked to tackle different use cases for other parts of the business. The marketing organization at your company would like you to build a model that can predict which books will be successful, so they can design more proactive marketing campaigns. Before you start development, you want to put together a high-level development plan so you can review deliverables and timelines with the marketing team.
+
+# Transform, Train, Test, Store, Serve
+
+## Wrap Up
