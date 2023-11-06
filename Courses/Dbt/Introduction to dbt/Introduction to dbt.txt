@@ -1,0 +1,596 @@
+## Users of dbt
+After being introduced to the idea of dbt, you'd like to make sure you understand who it's best for. There are multiple roles within your team, but you're not certain who might use dbt.
+
+# Likely to use dbt
+# DA, DE, AE
+
+## Version of dbt
+While learning about dbt, your manager would like to know what version of dbt is being used. You're not entirely sure what version is being used and want to learn how to find the currently installed version.
+
+# Run the following command in the terminal area:
+  
+dbt --version
+
+## dbt subcommands
+Which of the following is a valid dbt subcommand?
+
+# dbt docs is used to generate documentation from your dbt project.
+# dbt docs is used to generate documentation from your dbt project.
+# dbt run is used to create and process your data models.
+# dbt build combines several separate subcommands to create your project.
+
+## Initializing a dbt project
+In order to become familiar with dbt, your manager has asked you to create a sample project to work with New York City's Yellow Taxi Cab dataset. You'll need to work through the basic configuration of the project, entering the appropriate commands as required.
+
+# Run the following commands in the terminal window:
+
+dbt init
+
+# Note: You will need to specify the project name (nyc_yellow_taxi) and
+select the database type ([1] duckdb)
+  
+# Once complete run:
+  
+cd nyc_yellow_taxi
+
+ls
+
+## Creating a project profile
+As requested by your manager, you've initialized your dbt project. Reading further through the documentation, you notice that you need to create the project profile, which defines where your database / data warehouse information is defined. Your project is experimental at this point, and needs to work with DuckDB, a locally running database tool.
+
+You notice that dbt primarily uses YAML (abbreviated .yml) files for its configuration. On YAML files, you'll need to maintain spacing / formatting as illustrated to make sure the file parsing succeeds.
+
+# Edit the profiles.yml
+
+nyc_yellow_taxi:
+  outputs:
+    dev:
+      type: duckdb
+      path: dbt.duckdb
+  target: dev
+
+# Run the following command in the terminal after editing the profiles.yml file:
+  
+dbt debug
+
+## dbt project workflow
+As you've learned about dbt, you realize there are many steps to a workflow within a project. You wish to verify that you understand the proper order of a project workflow.
+
+# dbt init, Create, Define, dbt run, Verify
+
+## Running a project
+You've successfully created a project and defined the required parameters to connect to your data warehouse. Your manager is pleased with your accomplishments thus far and would like to see the project run in demo form. They would like the data to be materialized into the data warehouse from the initial data source, using some example configurations a colleague tested with previously. Note that your colleagues have provided a test script called datacheck to validate the contents of the data warehouse.
+
+# Update the taxi_rides_raw.sql
+
+-- Modify the following line to change the materialization type
+with source_data as (
+    -- Add the query as described to generate the data model
+    select * from read_parquet('yellow_tripdata_2023-01-partial.parquet')
+)
+
+select * from source_data
+
+## Modifying a model
+Your manager is pleased with the progress you've made thus far, but some requirements have changed. After speaking with the analytics team, they're concerned about the response time of a model. This model is currently configured to generate a view in the data warehouse, rather than a table. Currently the dbt configuration is set to create a view rather than generate a table for querying. Your manager asks that you update the appropriate configuration in the model and regenerate the transformations.
+
+# Update the taxi_rides_raw.sql
+
+-- Modify the following line to change the materialization type
+{{ config(materialized='table')}}
+
+
+with source_data as (
+    select * from read_parquet('yellow_tripdata_2023-01-partial.parquet')
+)
+
+select * from source_data
+
+# Run the following commands in the terminal:
+
+cd nyc_yellow_taxi
+dbt run
+
+## Features of a data model
+As you're learning about dbt, you realize you should have a solid understanding of the basics of data models. While reading through some details of data modeling, you decide to determine which features are true of a data model, and which are not.
+
+# False of a data model
+# Data structures can be considered a type of data model, but not all models map easily to a data structure.
+# Some implementations of data models may be written in SQL, but not all data models use SQL.
+
+## dbt model statements
+Which two of the following SQL statements could not be used as a dbt model?
+
+# Hint
+If a SELECT statement is valid, it is likely usable with dbt.
+UPDATE and DELETE statements don't work with dbt.
+
+# UPDATE raw_orders SET first_name='Lucas' WHERE order_date='2023-06-23'
+# DELETE * FROM raw_orders WHERE order_date < '2023-01-01'
+
+## Creating a dbt model
+You've learned a bit about models in dbt, but decide you'd like to implement one of your own prior to creating any for your team. You've decided to use the NYC Yellow taxi dataset to create a simple model representing all the trips taken on Jan 2, 2023.
+
+After looking at the NYC Yellow Taxi dataset, you decide it will be best to create a simple model that uses all columns in the NYC Yellow Taxi Parquet file.
+
+# Create a simple query
+
+select * from 'yellow_tripdata_2023-01-partial.parquet'
+
+# Run the following command in the terminal:
+
+dbt run
+
+## Config files
+You've just discovered the YAML files for dbt properties and want to make sure you understand how these and other configuration files are used. You decide to test your knowledge and verify the filenames work as you expect.
+
+# Project: profiles.yml, dbt_project.yml
+
+## Updating a dbt model
+Your team lead just forwarded you an email with a data request from the marketing department. They'd like to count all the credit card users by day be available in the data warehouse and automatically updated based on the current dbt models. The new model should be called total_creditcard_riders_by_day and contain columns for day and total_riders.
+
+There is currently a model (meaning a SQL table) available under the name taxi_rides_raw that you can query against. The schema document describing this table is available here: NYC Yellow Taxi data schema
+
+# Update the total_creditcard_riders_by_day.sql
+
+-- Update with SQL to return requested information
+select 
+   date_part('day', tpep_pickup_datetime) as day,
+   count(*) as total_riders
+from taxi_rides_raw
+where payment_type = 1
+group by day
+
+# Run the following commands in the terminal:
+dbt run
+./datacheck
+
+## No hierarchy model creation
+Consider you have the following 4 models defined:
+
+sales_raw
+all_weekend_sales
+total_sales_by_rep
+new_products_purchased_this_week
+
+If these models do not have a hierarchy or lineage defined in the source, in what order will dbt execute them?
+
+# all_weekend_sales
+# new_products_purchased_this_week
+# sales_raw
+# total_sales_by_rep
+
+## Hierarchical model creation
+Consider you have the following 4 models defined:
+
+sales_raw
+all_weekend_sales
+total_sales_by_rep
+new_products_purchased_this_week
+
+If all of the models except for sales_raw have a Jinja template in place of the table name (such as {{ ref('sales_raw') }}), in what order will dbt execute them?
+
+# sales_raw
+# all_weekend_sales
+# new_products_purchased_this_week
+# total_sales_by_rep
+
+## Updating model hierarchies
+You've successfully created and updated a couple of models in your dbt project. Your manager has asked that you verify all models will be generated in the appropriate order so that there are no errors during the materialization process.
+
+Note: be mindful of the spacing when writing functions.
+
+# Update the total_creditcard_riders_by_day.sql
+
+-- Update SQL to use Jinja reference
+select 
+   date_part('day', tpep_pickup_datetime) as day,
+   count(*) as total_riders
+from {{ ref('taxi_rides_raw') }}
+where payment_type = 1
+group by day
+
+# Run the following commands in the terminal:
+
+dbt run
+dbt run -f
+
+## Error classification
+To make sure you understand the various situations you may see, your team lead has asked you to classify each of these errors according to its type.
+
+# Invalid reference: Compilation Error Model ...
+
+## Process of troubleshooting
+Your team lead is impressed with your knowledge and updated skills with dbt. She has asked you to create a document to help your teammates troubleshoot issues with models in dbt. She's looking primarily for a workflow of the steps you'd take, in order, to try and troubleshoot issues that arise when working with dbt models.
+
+# dbt run, Review, View, Run, Verify
+
+## Troubleshooting model errors
+While trying to implement a model, you notice several errors that prevent the model from being generated. Your team lead has requested this model be implemented as quickly as possible, so you'll need to try to troubleshoot what errors are being seen and how to fix them.
+
+# Update the taxi_rides_raw.sql
+
+{{ config(materialized='view')}}
+
+
+with source_data as (
+    select * from read_parquet('yellow_tripdata.parquet')
+)
+
+select * from source_data
+
+# Run the following commands in the terminal:
+
+dbt run
+dbt run -f    
+
+## Built-in tests
+After studying the documentation on testing with dbt, you'd like to make sure you know which tests are built-in to dbt.
+
+# Not built-in test
+# is_upper
+# less_than
+# not_in
+
+## Defining tests on a model
+After learning about tests within dbt, your manager has asked you to implement some quality tests on the data used by the marketing department. It seems some entries are appearing without values, while others have a value, but do not match up with what's expected in the data.
+
+Specifically, the issues with the columns are as follows:
+
+fare_amount
+Column is occasionally blank, which causes issues in other calculations.
+Should be present for all rows.
+
+payment_type
+Column values need to be between 1 and 6.
+Should be present for all rows.
+
+# Update the model_properties.yml
+
+version: 2
+
+models:
+- name: taxi_rides_raw
+  columns:
+    - name: fare_amount
+      tests:
+        - not_null
+    - name: payment_type
+      tests:
+        - not_null
+        - accepted_values:
+            values: [1, 2, 3, 4, 5, 6]   
+
+# Run the following commands in the terminal:
+  
+dbt run
+dbt test
+
+## Finding bad data
+Your manager is pleased with your progress - after implementing the data validation tests in your project, they ask you to verify the current dataset for any issues. As such, you plan to test the data, identify any problems, and update your model to handle the issues.
+
+The initial project has been materialized for you with dbt run. You can test without running it first.
+
+# Update the taxi_rides_raw.sql 
+
+{{ config(materialized='view')}}
+
+
+with source_data as (
+    select * from read_parquet('yellow_tripdata_2023-01-partial.parquet')
+)
+
+-- Add a filter / WHERE clause to the line below
+select * from source_data where payment_type != 0
+
+# Run the following command in the terminal:
+  
+dbt run
+dbt test
+
+## Steps to develop a singular test
+You've just learned about singular tests in dbt. You'd like to make sure you understand the steps required to create a test and the order that they should occur.
+
+# Determine, Create, Save, dbt run, dbt test
+
+## Verifying trip duration
+Your teammate stops by your desk to discuss an issue being seen in the source data. He describes how on some rows, the duration of the trip occasionally shows as 0. While it could be filtered at the source data level, there are some downstream models that are storing the bad rows for discussion with the data provider. As such, he'd like you to develop a test that fails for triggering purposes if there's ever data where the trip duration is 0. You agree to look at the issue and implement the test code.
+
+Looking at the schema for the taxi_rides_raw model, you realize there's not really a single field representing the trip duration. After discussing it further with your colleague, the primary issue seems to be that the trip start and end fields are the same. You realize you can quickly write a query to check for this.
+
+You can refer to the schema document for information about the fields in the taxi_rides_raw table.
+
+Note that the dbt project has already been executed for you and should not be required.
+
+# Update the assert_trip_duration_gt_0.sql
+
+select * 
+from taxi_rides_raw
+-- Complete the test on the following line
+where tpep_pickup_datetime = tpep_dropoff_datetime
+
+# Run the following command in the terminal:
+  
+dbt test --select assert_trip_duration_gt_0.sql
+
+## Verifying test queries
+You've successfully implemented the assert_trip_duration_gt_0.sql query described in the previous exercise. As you've developed a successful test, you're tempted to leave it as is but you're curious if there are other solutions that would also provide proper validation for the test.
+
+After working through some potential SQL queries, you need to decide which two of the following SQL statements will meet the validation requirements. Remember, you want to validate that the trip duration is greater than 0 minutes. You can refer to the schema document for information about the fields in the taxi_rides_raw table if needed.
+
+# Valid test query
+# ... - ... = 0
+# ... - ...
+
+## Testing, testing, testing
+With all the styles of tests available in dbt, you want to make sure you understand exactly how and when to use them. As such, you decide to go through several examples of tests and determine what kind they best fit.
+
+# Singular
+# tests/assert_orderdate_after_feb_1.sql
+# select * ...
+
+## Implementing a reusable test
+After learning about reusable tests, you realize that you'd love to build an in-house set of common tests for you and your team to use as you see fit. You notice that your datasets have several scenarios where you want to verify the columns contain values greater than 0. You decide to start your library by writing a reusable test for this purpose.
+
+Note: Your data has not been materialized yet.
+
+# Update the check_gt_0.sql
+
+{% test check_gt_0(model, column_name) %}
+select * 
+from {{ model }}
+where {{ column_name }} <= 0
+{% endtest %}
+
+# Update the model_properties.yml
+
+version: 2
+
+models:
+- name: taxi_rides_raw
+  columns:
+    - name: fare_amount
+      tests:
+        - check_gt_0
+    - name: total_amount
+      tests:
+        - check_gt_0
+
+# Run dbt run in the terminal window
+# Run dbt test --select taxi_rides_raw or dbt test --select taxi_rides_raw.sql in the terminal window
+
+## Updating from singular to reusable test
+As you've recently successfully implemented a reusable test, you decide to go back and see if you can update a previous singular test to be reusable. Looking in your project files, you note that you previously created the assert_trip_duration_gt_0 test, which specifically checked for two fields being equal (in this case tpep_pickup_datetime and tpep_dropoff_datetime). After viewing your implementation, you decide to try and create a reusable test that implements the same functionality.
+
+Note: Your previous implementation is available and open to you for reference.
+
+# Edit the columns_equal.sql
+
+{% test columns_equal(model, column_name, column_name2) %}
+select *
+from {{ model }}
+where {{ column_name }} = {{ column_name2 }}
+{% endtest %}
+
+# Edit the model_properties.yml
+
+version: 2
+
+models:
+- name: taxi_rides_raw
+  columns:
+    - name: tpep_pickup_datetime
+      tests:
+        - columns_equal:
+            column_name2: tpep_dropoff_datetime
+
+# Run dbt run in the terminal.
+# Run dbt test --select taxi_rides_raw.sql or dbt test --select taxi_rides_raw in the terminal.
+
+## dbt docs Command Options
+Making use of dbt's documentation capability is a great way to share information between engineers and data consumers. Which of the following is not a valid command when using dbt docs?
+
+# dbt docs create
+
+## dbt documentation flow
+You've learned about the process for adding documentation for your dbt project and are excited to implement this functionality for your team. After proposing this to your team lead, she asks that you provide an example set of steps required in order to implement and provide the documentation to your team and data consumers.
+
+# Add, Use dbt run, Use dbt docs generate, Copy, Access
+
+## Creating dbt documentation
+Your ELT projects are moving forward well, and your team is pleased with the work you've done thus far. You've noticed that you're spending more time providing information about the models, the data types, and so forth. As updates are ongoing, you'd like to automate as much of your process as possible.
+
+While reading the documentation for dbt, you discover the dbt docs commands and realize it would be a great solution to your problems. You would like to implement these into your project for your current and future models and then serve the data to other users. Please note that we will not view the documentation within this exercise but rather make sure the content can be served.
+
+# Modify the models/model_properties.yml
+
+version: 2
+
+models:
+  - name: taxi_rides_raw
+    description: Initial import of the NYC Yellow Taxi trip data from Parquet source
+    access: public
+
+# Run the following commands in the terminal:
+
+dbt docs generate
+dbt docs serve
+
+## Orderly YML
+You've just learned about sources in dbt and want to verify whether you understand the proper order of items as they will appear in the model_properties.yml file. Specifically, you wish to have a source table named phone_orders in the raw database. The table should also have a validation applied to guarantee distinct ids whenever the tests are run.
+
+Note: These items are meant to represent what may appear in a dbt source definition, not everything that must appear. You may also ignore spacing of the yaml directives for this exercise.
+
+# sources, raw, tables, phone_orders, columns, id, tests, unique
+
+## Models, sources, or both?
+While studying about dbt's uses of sources, you realize there are a lot of similarities between models and sources. You discuss this with your tech lead, who asks you to create a quick cheat sheet for your team. She asks that you indicate the properties that are unique to the models, unique to the sources, and common to both.
+
+# Both
+# Can run tests
+# Could be defined in models/model_properties
+# Data lineage is applied
+
+## Adding a source
+As you've learned about dbt sources, your manager has asked that you re-implement the taxi_rides_raw content as a dbt source rather than simply an existing table. To make this change, you'll need to add a source to the appropriate file, and then update the taxi_rides_raw model to query the correct source. The source name being used is raw, and the table name is taxi_rides.
+
+Note: The data is already updated and in-place for you, but requires an updated reference before performing a dbt run command.
+
+# Modify the models/model_properties.yml
+
+version: 2
+
+sources:
+  - name: raw
+    tables:
+      - name: taxi_rides
+
+# Update the taxi_rides_raw
+
+{{ config(materialized='view')}}
+
+select * from {{ source('raw', 'taxi_rides') }}
+        
+
+# Run the following commands in the terminal:
+  
+dbt run
+datacheck
+
+## Kernels of truth
+Which two of the following statements are true of dbt seeds?
+
+# Seeds are (mostly) CSV files.
+# A user can manually define column datatypes on a seed.
+
+## ZIP is the code
+In preparation for your dbt projects, you realize that having a list of New York & New Jersey zip (postal) codes and some additional information would be good to add. Reading through the information, you realize that utilizing the dbt seed functionality would be a great way to add this information. For reference, zipcodes are 5 digit numeric values representing the postal code of an area in the US.
+
+The format of the zip file in question is:
+
+zipcode,place,state
+07093,West New York,New Jersey
+12007,Alcove,New York
+12009,Altamont,New York
+12023,Berne,New York
+
+This file is already downloaded for you (as nynj_zipcodes.csv), but may not be in the correct location, nor have the correct configuration.
+
+# Run the following command in the terminal window (or drag and drop the nynj_zipcodes.csv file into the seeds folder using the file explorer window.)
+
+mv nynj_zipcodes.csv seeds/
+
+# Modify the properties.yml
+
+version: 2
+
+seeds:
+  - name: nynj_zipcodes
+    config:
+      column_types:
+        zipcode: varchar(5)
+
+# Run dbt seed in the terminal window.
+
+# Run the command ./datacheck in the terminal window and verify you see zipcode information in the printed table.
+
+## Snapshot process
+After speaking with your manager, you decide that you should implement dbt snapshots on a given data table within your data warehouse. To make sure you have the correct process down, you decide to run through the order of implementing snapshots within dbt.
+
+# Create, Add, Select, Specify, Write, Run
+
+## Snapshot issue
+A member of your team has implemented snapshots in dbt for a given data model and is not seeing the expected changes for all rows. They provide the following information:
+
+The data for this model is updated on an hourly basis, with varying rows changing state on each hour.
+Approximately 500k rows are added or updated each hour.
+The batch process completes within its expected hourly timeframe.
+The snapshot process is automated to run every 24 hours.
+Multiple changes could happen to the same rows within a 24 hr period.
+What is the likely solution to their issue?
+
+# The snapshot should be run hourly, after the update process completes.
+# [Correct! - By running the dbt snapshot process once per day, it is missing rows where multiple changes are happening within a day. Running snapshots more frequently should alleviate the issue.]
+
+## Adding a snapshot
+When working with your team, you learn about a new tangential dataset being added to the data warehouse. This dataset represents the set of vehicles that will be in use for a given taxi license. While a taxi is likely to be used for quite some time, it is possible that the license may be reassigned to a new vehicle during a given timeframe. One of your colleagues realizes this may cause issues with future reporting as a ride may not be represented by the proper vehicle.
+
+The dataset looks like the following:
+
+column_name	    description
+license_id	    The numeric ID assigned to the taxi company
+vehicle_make	The manufacturer of the vehicle
+vehicle_model	The model of the vehicle
+vehicle_year	The year the vehicle was manufactured
+last_updated	Date when the record was last modified
+
+Looking at this information you realize this is a great time to implement snapshots using dbt. After discussing this with the team, your team lead asks you to implement the snapshot functionality in the nyc_yellow_taxi project, using the source named 'raw.vehicle_list'.
+
+# Edit the snapshot_vehicle_list.sql
+
+{% snapshot vehicle_list_snapshot %}
+
+{{
+    config(
+      target_schema='main',
+      unique_key='license_id',
+      strategy='timestamp',
+      updated_at='last_updated'
+    )
+}}
+
+select * from {{ source('raw', 'vehicle_list') }}
+{% endsnapshot %}
+
+# Run the command dbt snapshot
+
+## What can't dbt build do?
+After learning about dbt build, you want to make sure you understand the components used within. You decide to look at the various subcommands and sort them accordingly.
+
+# dbt build does not run this step
+# dbt docs
+# dbt compile
+
+## Helping the intern!
+After learning about dbt, you've successfully implemented several projects with your team. As your knowledge has increased, your status as a solid dbt practitioner has developed with the rest of the team. One of the interns has tried re-implementing a project from scratch, but is having issues getting the project to compile. Your team lead has asked you to take a look and fix the known issues in the project.
+
+Remember to look through the assorted YAML files to make sure things are named consistently in the project.
+
+# Run dbt build and look for errors.
+
+# Edit the vehicle_list_snapshot.sql
+
+{% snapshot vehicle_list_snapshot %}
+
+{{
+    config(
+      target_schema='main',
+      unique_key='license_id',
+      strategy='timestamp',
+      updated_at='last_updated'
+    )
+}}
+
+select * from {{ source('raw', 'vehicle_list') }}
+{% endsnapshot %}
+
+# Run dbt build again.
+
+# Edit the taxi_rides_raw.sql
+
+{{ config(materialized='view')}}
+
+select * from {{ source('raw', 'taxi_rides') }}
+        
+# Run dbt build once more and you should not see any errors.
+
+## Putting it all together
+You've successfully helped fix the issues your intern colleague experienced in their project. Now your team lead asks that you help with implementing the project in production. Now it's time to run through everything automatically and generate the appropriate output.
+
+# Run the following commands in the terminal:
+
+dbt build
+dbt docs generate
+dbt docs serve
+
+## Course review
