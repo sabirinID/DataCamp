@@ -489,3 +489,441 @@ Recall that if you're dealing with binary features (categorical features with on
 Your goal is to determine which of the mentioned features is not binary, and to apply one-hot encoding only to this one.
 """
 
+# Concatenate train and test together
+houses = pd.concat([train, test])
+
+# Look at feature distributions
+print(houses['RoofStyle'].value_counts(), '\n')
+print(houses['CentralAir'].value_counts())
+
+# Which of the features is binary?
+# CentralAir
+    # Y    2723
+    # N     196
+    # Name: CentralAir, dtype: int64
+
+# Concatenate train and test together
+houses = pd.concat([train, test])
+
+# Label encode binary 'CentralAir' feature
+from sklearn.preprocessing import LabelEncoder
+le = LabelEncoder()
+houses['CentralAir_enc'] = le.fit_transform(houses['CentralAir'])
+
+# Concatenate train and test together
+houses = pd.concat([train, test])
+
+# Label encode binary 'CentralAir' feature
+from sklearn.preprocessing import LabelEncoder
+le = LabelEncoder()
+houses['CentralAir_enc'] = le.fit_transform(houses['CentralAir'])
+
+# Create One-Hot encoded features
+ohe = pd.get_dummies(houses['RoofStyle'], prefix='RoofStyle')
+
+# Concatenate OHE features to houses
+houses = pd.concat([houses, ohe], axis=1)
+
+# Look at OHE features
+print(houses[[col for col in houses.columns if 'RoofStyle' in col]].head(3))
+
+## Mean target encoding
+"""
+First of all, you will create a function that implements mean target encoding. Remember that you need to develop the two following steps:
+
+1. Calculate the mean on the train, apply to the test
+2. Split train into K folds. Calculate the out-of-fold mean for each fold, apply to this particular fold
+
+Each of these steps will be implemented in a separate function: test_mean_target_encoding() and train_mean_target_encoding(), respectively.
+
+The final function mean_target_encoding() takes as arguments: the train and test DataFrames, the name of the categorical column to be encoded, the name of the target column and a smoothing parameter alpha. It returns two values: a new feature for train and test DataFrames, respectively.
+"""
+
+def test_mean_target_encoding(train, test, target, categorical, alpha=5):
+    # Calculate global mean on the train data
+    global_mean = train[target].mean()
+    
+    # Group by the categorical feature and calculate its properties
+    train_groups = train.groupby(categorical)
+    category_sum = train_groups[target].sum()
+    category_size = train_groups.size()
+    
+    # Calculate smoothed mean target statistics
+    train_statistics = (category_sum + global_mean * alpha) / (category_size + alpha)
+    
+    # Apply statistics to the test data and fill new categories
+    test_feature = test[categorical].map(train_statistics).fillna(global_mean)
+    return test_feature.values
+
+def train_mean_target_encoding(train, target, categorical, alpha=5):
+    # Create 5-fold cross-validation
+    kf = KFold(n_splits=5, random_state=123, shuffle=True)
+    train_feature = pd.Series(index=train.index)
+    
+    # For each folds split
+    for train_index, test_index in kf.split(train):
+        cv_train, cv_test = train.iloc[train_index ], train.iloc[test_index]
+      
+        # Calculate out-of-fold statistics and apply to cv_test
+        cv_test_feature = test_mean_target_encoding(cv_train, cv_test, target, categorical, alpha)
+        
+        # Save new feature for this particular fold
+        train_feature.iloc[test_index] = cv_test_feature       
+    return train_feature.values
+
+def mean_target_encoding(train, test, target, categorical, alpha=5):
+  
+    # Get the train feature
+    train_feature = train_mean_target_encoding(train, target, categorical, alpha)
+  
+    # Get the test feature
+    test_feature = test_mean_target_encoding(train, test, target, categorical, alpha)
+    
+    # Return new features to add to the model
+    return train_feature, test_feature
+
+## K-fold cross-validation
+"""
+You will work with a binary classification problem on a subsample from Kaggle playground competition. The objective of this competition is to predict whether a famous basketball player Kobe Bryant scored a basket or missed a particular shot.
+
+Train data is available in your workspace as bryant_shots DataFrame. It contains data on 10,000 shots with its properties and a target variable "shot\_made\_flag" -- whether shot was scored or not.
+
+One of the features in the data is "game_id" -- a particular game where the shot was made. There are 541 distinct games. So, you deal with a high-cardinality categorical feature. Let's encode it using a target mean!
+
+Suppose you're using 5-fold cross-validation and want to evaluate a mean target encoded feature on the local validation.
+"""
+
+# Create 5-fold cross-validation
+kf = KFold(n_splits=5, random_state=123, shuffle=True)
+
+# For each folds split
+for train_index, test_index in kf.split(bryant_shots):
+    cv_train, cv_test = bryant_shots.iloc[train_index], bryant_shots.iloc[test_index]
+
+    # Create mean target encoded feature
+    cv_train['game_id_enc'], cv_test['game_id_enc'] = mean_target_encoding(train=cv_train,
+                                                                           test=cv_test,
+                                                                           target='shot_made_flag',
+                                                                           categorical='game_id',
+                                                                           alpha=5)
+    # Look at the encoding
+    print(cv_train[['game_id', 'shot_made_flag', 'game_id_enc']].sample(n=1))
+
+## Beyond binary classification
+"""
+Of course, binary classification is just a single special case. Target encoding could be applied to any target variable type:
+
+For binary classification usually mean target encoding is used
+For regression mean could be changed to median, quartiles, etc.
+For multi-class classification with N classes we create N features with target mean for each category in one vs. all fashion
+
+The mean_target_encoding() function you've created could be used for any target type specified above. Let's apply it for the regression problem on the example of House Prices Kaggle competition.
+
+Your goal is to encode a categorical feature "RoofStyle" using mean target encoding. The train and test DataFrames are already available in your workspace.
+"""
+
+# Create mean target encoded feature
+train['RoofStyle_enc'], test['RoofStyle_enc'] = mean_target_encoding(train=train,
+                                                                     test=test,
+                                                                     target='SalePrice',
+                                                                     categorical='RoofStyle',
+                                                                     alpha=10)
+
+# Look at the encoding
+print(test[['RoofStyle', 'RoofStyle_enc']].drop_duplicates())
+
+## Find missing data
+"""
+Let's impute missing data on a real Kaggle dataset. For this purpose, you will be using a data subsample from the Kaggle "Two sigma connect: rental listing inquiries" competition.
+
+Before proceeding with any imputing you need to know the number of missing values for each of the features. Moreover, if the feature has missing values, you should explore the type of this feature.
+"""
+
+# Read DataFrame
+twosigma = pd.read_csv('twosigma_train.csv')
+
+# Find the number of missing values in each column
+print(twosigma.isnull().sum())
+
+# Look at the columns with the missing values
+print(twosigma[['building_id', 'price']].head())
+
+## Impute missing data
+"""
+You've found that "price" and "building_id" columns have missing values in the Rental Listing Inquiries dataset. So, before passing the data to the models you need to impute these values.
+
+Numerical feature "price" will be encoded with a mean value of non-missing prices.
+
+Imputing categorical feature "building_id" with the most frequent category is a bad idea, because it would mean that all the apartments with a missing "building_id" are located in the most popular building. The better idea is to impute it with a new category.
+
+The DataFrame rental_listings with competition data is read for you.
+"""
+
+# Import SimpleImputer
+from sklearn.impute import SimpleImputer
+
+# Create mean imputer
+mean_imputer = SimpleImputer(strategy='mean')
+
+# Price imputation
+rental_listings[['price']] = mean_imputer.fit_transform(rental_listings[['price']])
+
+# Import SimpleImputer
+from sklearn.impute import SimpleImputer
+
+# Create constant imputer
+constant_imputer = SimpleImputer(strategy='constant', fill_value='MISSING')
+
+# building_id imputation
+rental_listings[['building_id']] = constant_imputer.fit_transform(rental_listings[['building_id']])
+
+## Replicate validation score
+"""
+You've seen both validation and Public Leaderboard scores in the video. However, the code examples are available only for the test data. To get the validation scores you have to repeat the same process on the holdout set.
+
+Throughout this chapter, you will work with New York City Taxi competition data. The problem is to predict the fare amount for a taxi ride in New York City. The competition metric is the root mean squared error.
+
+The first goal is to evaluate the Baseline model on the validation data. You will replicate the simplest Baseline based on the mean of "fare_amount". Recall that as a validation strategy we used a 30% holdout split with validation_train as train and validation_test as holdout DataFrames. Both of them are available in your workspace.
+"""
+
+import numpy as np
+from sklearn.metrics import mean_squared_error
+from math import sqrt
+
+# Calculate the mean fare_amount on the validation_train data
+naive_prediction = np.mean(validation_train['fare_amount'])
+
+# Assign naive prediction to all the holdout observations
+validation_test['pred'] = naive_prediction
+
+# Measure the local RMSE
+rmse = sqrt(mean_squared_error(validation_test['fare_amount'], validation_test['pred']))
+print('Validation RMSE for Baseline I model: {:.3f}'.format(rmse))
+
+## Baseline based on the date
+"""
+We've already built 3 different baseline models. To get more practice, let's build a couple more. The first model is based on the grouping variables. It's clear that the ride fare could depend on the part of the day. For example, prices could be higher during the rush hours.
+
+Your goal is to build a baseline model that will assign the average "fare_amount" for the corresponding hour. For now, you will create the model for the whole train data and make predictions for the test dataset.
+
+The train and test DataFrames are available in your workspace. Moreover, the "pickup_datetime" column in both DataFrames is already converted to a datetime object for you.
+"""
+
+# Get pickup hour from the pickup_datetime column
+train['hour'] = train['pickup_datetime'].dt.hour
+test['hour'] = test['pickup_datetime'].dt.hour
+
+# Calculate average fare_amount grouped by pickup hour 
+hour_groups = train.groupby('hour')['fare_amount'].mean()
+
+# Make predictions on the test set
+test['fare_amount'] = test.hour.map(hour_groups)
+
+# Write predictions
+test[['id','fare_amount']].to_csv('hour_mean_sub.csv', index=False)
+
+## Baseline based on the gradient boosting
+"""
+Let's build a final baseline based on the Random Forest. You've seen a huge score improvement moving from the grouping baseline to the Gradient Boosting in the video. Now, you will use sklearn's Random Forest to further improve this score.
+
+The goal of this exercise is to take numeric features and train a Random Forest model without any tuning. After that, you could make test predictions and validate the result on the Public Leaderboard. Note that you've already got an "hour" feature which could also be used as an input to the model.
+"""
+
+from sklearn.ensemble import RandomForestRegressor
+
+# Select only numeric features
+features = ['pickup_longitude', 'pickup_latitude', 'dropoff_longitude',
+            'dropoff_latitude', 'passenger_count', 'hour']
+
+# Train a Random Forest model
+rf = RandomForestRegressor()
+rf.fit(train[features], train.fare_amount)
+
+# Make predictions on the test data
+test['fare_amount'] = rf.predict(test[features])
+
+# Write predictions
+test[['id','fare_amount']].to_csv('rf_sub.csv', index=False)
+
+## Grid search
+"""
+Recall that we've created a baseline Gradient Boosting model in the previous lesson. Your goal now is to find the best max_depth hyperparameter value for this Gradient Boosting model. This hyperparameter limits the number of nodes in each individual tree. You will be using K-fold cross-validation to measure the local performance of the model for each hyperparameter value.
+
+You're given a function get_cv_score(), which takes the train dataset and dictionary of the model parameters as arguments and returns the overall validation RMSE score over 3-fold cross-validation.
+"""
+
+# Possible max depth values
+max_depth_grid = [3, 6, 9, 12, 15]
+results = {}
+
+# For each value in the grid
+for max_depth_candidate in max_depth_grid:
+    # Specify parameters for the model
+    params = {'max_depth': max_depth_candidate}
+
+    # Calculate validation score for a particular hyperparameter
+    validation_score = get_cv_score(train, params)
+
+    # Save the results for each max depth value
+    results[max_depth_candidate] = validation_score   
+print(results)
+
+## 2D grid search
+"""
+The drawback of tuning each hyperparameter independently is a potential dependency between different hyperparameters. The better approach is to try all the possible hyperparameter combinations. However, in such cases, the grid search space is rapidly expanding. For example, if we have 2 parameters with 10 possible values, it will yield 100 experiment runs.
+
+Your goal is to find the best hyperparameter couple of max_depth and subsample for the Gradient Boosting model. subsample is a fraction of observations to be used for fitting the individual trees.
+
+You're given a function get_cv_score(), which takes the train dataset and dictionary of the model parameters as arguments and returns the overall validation RMSE score over 3-fold cross-validation.
+"""
+
+import itertools
+
+# Hyperparameter grids
+max_depth_grid = [3, 5, 7]
+subsample_grid = [0.8, 0.9, 1.0]
+results = {}
+
+# For each couple in the grid
+for max_depth_candidate, subsample_candidate in itertools.product(max_depth_grid, subsample_grid):
+    params = {'max_depth': max_depth_candidate,
+              'subsample': subsample_candidate}
+    validation_score = get_cv_score(train, params)
+    # Save the results for each couple
+    results[(max_depth_candidate, subsample_candidate)] = validation_score   
+print(results)
+
+## Model blending
+"""
+You will start creating model ensembles with a blending technique.
+
+Your goal is to train 2 different models on the New York City Taxi competition data. Make predictions on the test data and then blend them using a simple arithmetic mean.
+
+The train and test DataFrames are already available in your workspace. features is a list of columns to be used for training and it is also available in your workspace. The target variable name is "fare_amount".
+"""    
+
+from sklearn.ensemble import GradientBoostingRegressor, RandomForestRegressor
+
+# Train a Gradient Boosting model
+gb = GradientBoostingRegressor().fit(train[features], train.fare_amount)
+
+# Train a Random Forest model
+rf = RandomForestRegressor().fit(train[features], train.fare_amount)
+
+# Make predictions on the test data
+test['gb_pred'] = gb.predict(test[features])
+test['rf_pred'] = rf.predict(test[features])
+
+# Find mean of model predictions
+test['blend'] = (test['gb_pred'] + test['rf_pred']) / 2
+print(test[['gb_pred', 'rf_pred', 'blend']].head(3))
+
+## Model stacking I
+"""
+Now it's time for stacking. To implement the stacking approach, you will follow the 6 steps we've discussed in the previous video:
+
+1. Split train data into two parts
+2. Train multiple models on Part 1
+3. Make predictions on Part 2
+4. Make predictions on the test data
+5. Train a new model on Part 2 using predictions as features
+6. Make predictions on the test data using the 2nd level model
+
+train and test DataFrames are already available in your workspace. features is a list of columns to be used for training on the Part 1 data and it is also available in your workspace. Target variable name is "fare_amount".
+"""
+
+from sklearn.model_selection import train_test_split
+from sklearn.ensemble import GradientBoostingRegressor, RandomForestRegressor
+
+# Split train data into two parts
+part_1, part_2 = train_test_split(train, test_size=0.5, random_state=123)
+
+# Train a Gradient Boosting model
+gb = GradientBoostingRegressor().fit(part_1[features], part_1.fare_amount)
+
+# Train a Random Forest model on Part 1
+rf = RandomForestRegressor().fit(part_1[features], part_1.fare_amount)
+
+# Make predictions on the Part 2 data
+part_2['gb_pred'] = gb.predict(part_2[features])
+part_2['rf_pred'] = rf.predict(part_2[features])
+
+# Make predictions on the test data
+test['gb_pred'] = gb.predict(test[features])
+test['rf_pred'] = rf.predict(test[features])
+
+## Model stacking II
+"""
+OK, what you've done so far in the stacking implementation:
+
+1. Split train data into two parts
+2. Train multiple models on Part 1
+3. Make predictions on Part 2
+4. Make predictions on the test data
+
+Now, your goal is to create a second level model using predictions from steps 3 and 4 as features. So, this model is trained on Part 2 data and then you can make stacking predictions on the test data.
+
+part_2 and test DataFrames are already available in your workspace. Gradient Boosting and Random Forest predictions are stored in these DataFrames under the names "gb_pred" and "rf_pred", respectively.
+"""
+
+from sklearn.linear_model import LinearRegression
+
+# Create linear regression model without the intercept
+lr = LinearRegression(fit_intercept=False)
+
+# Train 2nd level model on the Part 2 data
+lr.fit(part_2[['gb_pred', 'rf_pred']], part_2.fare_amount)
+
+# Make stacking predictions on the test data
+test['stacking'] = lr.predict(test[['gb_pred', 'rf_pred']])
+
+# Look at the model coefficients
+print(lr.coef_)
+
+## Testing Kaggle forum ideas
+"""
+Unfortunately, not all the Forum posts and Kernels are necessarily useful for your model. So instead of blindly incorporating ideas into your pipeline, you should test them first.
+
+You're given a function get_cv_score(), which takes a train dataset as an argument and returns the overall validation root mean squared error over 3-fold cross-validation. The train DataFrame is already available in your workspace.
+
+You should try different suggestions from the Kaggle Forum and check whether they improve your validation score.
+"""
+
+# Drop passenger_count column
+new_train_1 = train.drop('passenger_count', axis=1)
+
+# Compare validation scores
+initial_score = get_cv_score(train)
+new_score = get_cv_score(new_train_1)
+
+print('Initial score is {} and the new score is {}'.format(initial_score, new_score))
+
+# Create copy of the initial train DataFrame
+new_train_2 = train.copy()
+
+# Find sum of pickup latitude and ride distance
+new_train_2['weird_feature'] = new_train_2['pickup_latitude'] + new_train_2['distance_km']
+
+# Compare validation scores
+initial_score = get_cv_score(train)
+new_score = get_cv_score(new_train_2)
+
+print('Initial score is {} and the new score is {}'.format(initial_score, new_score))
+
+# Be aware that not all the ideas shared publicly could work for you! In this particular case, dropping the "passenger_count" feature helped, while finding the sum of pickup latitude and ride distance did not. The last action you perform in any Kaggle competition is selecting final submissions. Go on to practice it!
+
+## Select final submissions
+"""
+The last action in every competition is selecting final submissions. Your goal is to select 2 final submissions based on the local validation and Public Leaderboard scores. Suppose that the competition metric is RMSE (the lower the metric the better). Keep up with a selection strategy we've discussed in the slides:
+
+1. Local validation: 1.25; Leaderboard: 1.35.
+2. Local validation: 1.32; Leaderboard: 1.39.
+3. Local validation: 1.10; Leaderboard: 1.29.
+4. Local validation: 1.17; Leaderboard: 1.25.
+5. Local validation: 1.21; Leaderboard: 1.32.
+"""
+
+# 3 and 4
+# Correct! Submission 3 is the best on local validation and submission 4 is the best on Public Leaderboard. So, it's the best choice for the final submissions!
+
+## Final thoughts
